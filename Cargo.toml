@@ -1,6 +1,11 @@
 [package]
 name = "ipa2ru"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+description = "Translator from IPA to russian"
+authors = ["Mira Luŝajeva <miralushch@gmail.com>"]
+license = "MIT"
+license-file = "LICENSE"
 
 [dependencies]
+clap = { version = "3.2.15", features = ["derive"] }
