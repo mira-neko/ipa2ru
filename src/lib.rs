@@ -15,9 +15,9 @@ struct RuPhoneme {
     is_palatalized: bool,
 }
 
-pub struct IPA(Vec<Sound>);
+pub struct Ipa(Vec<Sound>);
 
-impl IPA {
+impl Ipa {
     pub fn new(ipa: String) -> Self {
         todo!()
     }
@@ -30,7 +30,7 @@ impl IPA {
 pub struct RuPhonemeSec(Vec<RuPhoneme>);
 
 impl RuPhonemeSec {
-    pub fn new(ipa: IPA) -> Self {
+    pub fn new(ipa: Ipa) -> Self {
         ipa.get().fold(Self::default(), Self::next)
     }
 
