@@ -2,7 +2,12 @@ use std::fmt;
 
 enum Sounds {}
 
-enum RuPhonemes {}
+enum RuPhonemes {
+    A,  E,  I,  O,  U,  Y,  P,
+    B,  F,  V,  K,  G,  T,  D,
+    Sx, Sq, Zx, S,  Z,  J,  L,
+    M,  N,  R,  H,  C,  Cq
+}
 
 struct Sound {
     sound: Sounds,
