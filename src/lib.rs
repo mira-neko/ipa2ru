@@ -13,7 +13,7 @@ enum RuPhonemes {
 }
 
 #[allow(dead_code)]
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct Sound {
     sound: Sounds,
     is_palatalized: bool,
@@ -21,7 +21,7 @@ struct Sound {
 }
 
 #[allow(dead_code)]
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct RuPhoneme {
     phoneme: RuPhonemes,
     is_palatalized: bool,
