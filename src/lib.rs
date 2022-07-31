@@ -1,10 +1,10 @@
 use std::fmt;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd)]
 enum Sounds {}
 
 #[allow(dead_code)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd)]
 enum RuPhonemes {
     A,  E,  I,  O,  U,  Y,  P,
     B,  F,  V,  K,  G,  T,  D,
