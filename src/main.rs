@@ -1,7 +1,7 @@
 mod lib;
 
 use clap::Parser;
-use lib::{RuPhonemeSec, Ipa};
+use lib::{RuPhonemeSeq, Ipa};
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -15,5 +15,5 @@ fn main() {
 
     let parsed_ipa = Ipa::new(ipa);
 
-    println!("{}", RuPhonemeSec::new(parsed_ipa));
+    println!("{}", RuPhonemeSeq::new(parsed_ipa));
 }
