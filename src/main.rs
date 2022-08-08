@@ -1,7 +1,9 @@
-mod lib;
+mod ipa;
+mod ru;
 
 use clap::Parser;
-use lib::{RuPhonemeSeq, Ipa};
+use ipa::Ipa;
+use ru::Ru;
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -10,10 +12,12 @@ struct Cli {
     ipa: String,
 }
 
-fn main() {
+fn main() -> Result<(), ipa::SoundError> {
     let ipa = Cli::parse().ipa;
 
-    let parsed_ipa = Ipa::new(ipa);
+    let parsed_ipa = Ipa::new(&ipa)?;
 
-    println!("{}", RuPhonemeSeq::new(parsed_ipa));
+    println!("{}", Ru::new(parsed_ipa));
+
+    Ok(())
 }
