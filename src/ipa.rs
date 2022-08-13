@@ -4,7 +4,11 @@ use std::{fmt, ops::Deref};
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd)]
 pub enum Vowels {
     CloseBackRoundedVowel,
+    MidCentralVowel,
     NearOpenFrontUroundedVowel,
+    OpenBackUnroundedVowel,
+    OpenFrontUnroundedVowel,
+    OpenMidBackUnroundedVowel
 }
 
 #[deny(dead_code)]
@@ -100,7 +104,11 @@ impl Ipa {
                 'm' => push_consonant!(vec, is_longing_next, is_palatalizizg_next, VoicedBilabialNasal),
 
                 'u' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, CloseBackRoundedVowel),
+                'ə' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, MidCentralVowel),
                 'æ' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, NearOpenFrontUroundedVowel),
+                'ɑ' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, OpenBackUnroundedVowel),
+                'a' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, OpenFrontUnroundedVowel),
+                'ʌ' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, OpenMidBackUnroundedVowel),
 
                 'ʲ' => continue,
                 'ː' => continue,

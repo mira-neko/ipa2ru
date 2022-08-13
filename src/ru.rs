@@ -66,7 +66,11 @@ impl PhonemeSeq {
         match *sound {
             ipa::Sound::Vowel { phoneme, is_long } => match phoneme {
                 ipa::Vowels::CloseBackRoundedVowel => push_vowel!(vec, is_long, U),
+                ipa::Vowels::MidCentralVowel => push_vowel!(vec, is_long, A),
                 ipa::Vowels::NearOpenFrontUroundedVowel => push_vowel!(vec, is_long, A),
+                ipa::Vowels::OpenBackUnroundedVowel => push_vowel!(vec, is_long, A),
+                ipa::Vowels::OpenFrontUnroundedVowel => push_vowel!(vec, is_long, A),
+                ipa::Vowels::OpenMidBackUnroundedVowel => push_vowel!(vec, is_long, A),
             },
             ipa::Sound::Consonant { phoneme, is_long, is_palatalized } => match phoneme {
                 ipa::Consonants::VoicedAlveolarNasal => push_consonant!(vec, is_long, is_palatalized, N),
