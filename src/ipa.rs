@@ -1,13 +1,17 @@
 use std::{fmt, ops::Deref};
 
+#[deny(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd)]
 pub enum Vowels {
-    NearOpenFrontUroundedVowel
+    CloseBackRoundedVowel,
+    NearOpenFrontUroundedVowel,
 }
 
+#[deny(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd)]
 pub enum Consonants {
-    VoicedAlveolarNasal
+    VoicedAlveolarNasal,
+    VoicedBilabialNasal
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd)]
@@ -47,6 +51,31 @@ impl Sound {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Ipa(Vec<Sound>);
 
+macro_rules! push_sound {
+    ($vec:ident, $phoneme:expr) => {
+        $vec.push($phoneme?)
+    };
+}
+
+macro_rules! push_vowel {
+    ($vec:ident, $is_long:ident, $phoneme:ident) => {
+        push_sound!($vec, Sound::new(Sound::Vowel {
+            phoneme: Vowels::$phoneme,
+            is_long: $is_long,
+        }))
+    };
+}
+
+macro_rules! push_consonant {
+    ($vec:ident, $is_long:ident, $is_palatalizizg_next:ident, $phoneme:ident) => {
+        push_sound!($vec, Sound::new(Sound::Consonant {
+            phoneme: Consonants::$phoneme,
+            is_long: $is_long,
+            is_palatalized: $is_palatalizizg_next
+        }))
+    };
+}
+
 impl Ipa {
     pub fn new(ipa: &str) -> Result<Self, SoundError> {
         let ipa: Vec<_> = ipa.chars().collect();
@@ -60,17 +89,23 @@ impl Ipa {
                     _ => false
                 }
             };
+            let is_longing_next = if i == ipa.len() - 1 {
+                false
+            } else {
+                match ipa[i + 1] {
+                    'ː' => true,
+                    _ => false
+                }
+            };
             match ipa[i] {
-                'n' => vec.push(Sound::new(Sound::Consonant {
-                    phoneme: Consonants::VoicedAlveolarNasal,
-                    is_long: false,
-                    is_palatalized: is_palatalizizg_next
-                })?),
-                'æ' => vec.push(Sound::new(Sound::Vowel {
-                    phoneme: Vowels::NearOpenFrontUroundedVowel,
-                    is_long: false,
-                })?),
+                'n' => push_consonant!(vec, is_longing_next, is_palatalizizg_next, VoicedAlveolarNasal),
+                'm' => push_consonant!(vec, is_longing_next, is_palatalizizg_next, VoicedBilabialNasal),
+
+                'u' => push_vowel!(vec, is_longing_next, CloseBackRoundedVowel),
+                'æ' => push_vowel!(vec, is_longing_next, NearOpenFrontUroundedVowel),
+
                 'ʲ' => continue,
+                'ː' => continue,
                 _ => todo!()
             }
         }

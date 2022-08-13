@@ -59,6 +59,29 @@ impl Phoneme {
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct PhonemeSeq(Vec<Phoneme>);
 
+macro_rules! push_phoneme {
+    ($vec:ident, $is_long:ident, $phoneme:expr) => {
+        if $is_long {
+            $vec.push($phoneme);
+            $vec.push($phoneme);
+        } else {
+            $vec.push($phoneme);
+        }
+    };
+}
+
+macro_rules! push_vowel {
+    ($vec:ident, $is_long:ident, $phoneme:ident) => {
+        push_phoneme!($vec, $is_long, Phoneme::new(Phoneme::Vowel { phoneme: Vowels::$phoneme }).unwrap())
+    };
+}
+
+macro_rules! push_consonant {
+    ($vec:ident, $is_long:ident, $is_palatalized:ident, $phoneme:ident) => {
+        push_phoneme!($vec, $is_long, Phoneme::new(Phoneme::Consonant { phoneme: Consonants::$phoneme, $is_palatalized }).unwrap())
+    };
+}
+
 impl PhonemeSeq {
     fn new(ipa: ipa::Ipa) -> Self {
         (&ipa).into_iter().fold(Self::default(), Self::next)
@@ -68,20 +91,12 @@ impl PhonemeSeq {
         let mut vec = self.0.clone();
         match *sound {
             ipa::Sound::Vowel { phoneme, is_long } => match phoneme {
-                ipa::Vowels::NearOpenFrontUroundedVowel => if is_long {
-                    vec.push(Phoneme::new(Phoneme::Vowel { phoneme: Vowels::A }).unwrap());
-                    vec.push(Phoneme::new(Phoneme::Vowel { phoneme: Vowels::A }).unwrap());
-                } else {
-                    vec.push(Phoneme::new(Phoneme::Vowel { phoneme: Vowels::A }).unwrap());
-                }
+                ipa::Vowels::CloseBackRoundedVowel => push_vowel!(vec, is_long, U),
+                ipa::Vowels::NearOpenFrontUroundedVowel => push_vowel!(vec, is_long, A),
             },
             ipa::Sound::Consonant { phoneme, is_long, is_palatalized } => match phoneme {
-                ipa::Consonants::VoicedAlveolarNasal => if is_long {
-                    vec.push(Phoneme::new(Phoneme::Consonant { phoneme: Consonants::N, is_palatalized }).unwrap());
-                    vec.push(Phoneme::new(Phoneme::Consonant { phoneme: Consonants::N, is_palatalized }).unwrap());
-                } else {
-                    vec.push(Phoneme::new(Phoneme::Consonant { phoneme: Consonants::N, is_palatalized }).unwrap());
-                }
+                ipa::Consonants::VoicedAlveolarNasal => push_consonant!(vec, is_long, is_palatalized, N),
+                ipa::Consonants::VoicedBilabialNasal => push_consonant!(vec, is_long, is_palatalized, M),
             }
         }
         PhonemeSeq(vec)
@@ -257,7 +272,7 @@ mod ru_phoneme_seq_fmt_tests {
     use super::*;
 
     #[test]
-    fn test_nya() -> Result<(), PhonemeError> {
+    fn test_nja() -> Result<(), PhonemeError> {
         assert_eq!(format!("{}", PhonemeSeq(vec![
             Phoneme::new(Phoneme::Consonant { phoneme: Consonants::N, is_palatalized: true })?,
             Phoneme::new(Phoneme::Vowel { phoneme: Vowels::A })?,
@@ -343,10 +358,19 @@ mod ru_integration_tests {
     use super::*;
 
     #[test]
-    fn test_nya() -> Result<(), PhonemeError> {
+    fn test_nja() -> Result<(), PhonemeError> {
         assert_eq!(
             format!("{}", Ru::new(ipa::Ipa::new("nʲæ").unwrap())),
             "ня"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_mjaau() -> Result<(), PhonemeError> {
+        assert_eq!(
+            format!("{}", Ru::new(ipa::Ipa::new("mʲæːu").unwrap())),
+            "мяау"
         );
         Ok(())
     }
