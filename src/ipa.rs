@@ -15,7 +15,8 @@ pub enum Vowels {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd)]
 pub enum Consonants {
     VoicedAlveolarNasal,
-    VoicedBilabialNasal
+    VoicedBilabialNasal,
+    VoicedPalatalApproximant
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd)]
@@ -102,6 +103,7 @@ impl Ipa {
             match ipa[i] {
                 'n' => push_consonant!(vec, is_longing_next, is_palatalizizg_next, VoicedAlveolarNasal),
                 'm' => push_consonant!(vec, is_longing_next, is_palatalizizg_next, VoicedBilabialNasal),
+                'j' => push_consonant!(vec, is_longing_next, is_palatalizizg_next, VoicedPalatalApproximant),
 
                 'u' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, CloseBackRoundedVowel),
                 'ə' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, MidCentralVowel),

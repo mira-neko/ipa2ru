@@ -56,6 +56,12 @@ macro_rules! push_consonant {
     };
 }
 
+macro_rules! push_palatalized_only_consonant {
+    ($vec:ident, $is_long:ident, $phoneme:ident) => {
+        push_phoneme!($vec, $is_long, Phoneme::PalatalizedOnlyConsonant { phoneme: PalatalizedOnlyConsonants::$phoneme })
+    };
+}
+
 impl PhonemeSeq {
     fn new(ipa: ipa::Ipa) -> Self {
         (&ipa).into_iter().fold(Self::default(), Self::next)
@@ -75,6 +81,7 @@ impl PhonemeSeq {
             ipa::Sound::Consonant { phoneme, is_long, is_palatalized } => match phoneme {
                 ipa::Consonants::VoicedAlveolarNasal => push_consonant!(vec, is_long, is_palatalized, N),
                 ipa::Consonants::VoicedBilabialNasal => push_consonant!(vec, is_long, is_palatalized, M),
+                ipa::Consonants::VoicedPalatalApproximant => push_palatalized_only_consonant!(vec, is_long, J),
             }
         }
         PhonemeSeq(vec)
