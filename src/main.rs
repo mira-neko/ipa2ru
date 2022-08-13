@@ -12,7 +12,7 @@ struct Cli {
     ipa: String,
 }
 
-fn main() -> Result<(), ipa::SoundError> {
+fn main() -> Result<(), ipa::Error> {
     let ipa = Cli::parse().ipa;
 
     let parsed_ipa = Ipa::new(&ipa)?;
