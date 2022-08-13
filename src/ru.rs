@@ -374,4 +374,13 @@ mod ru_integration_tests {
         );
         Ok(())
     }
+
+    #[test]
+    fn test_mmjaau() -> Result<(), PhonemeError> {
+        assert_eq!(
+            format!("{}", Ru::new(ipa::Ipa::new("mʲːæːu").unwrap())),
+            "мьмяау"
+        );
+        Ok(())
+    }
 }

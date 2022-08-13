@@ -91,6 +91,11 @@ impl Ipa {
             };
             let is_longing_next = if i == ipa.len() - 1 {
                 false
+            } else if i <= ipa.len() - 2 && is_palatalizizg_next {
+                match ipa[i + 2] {
+                    'ː' => true,
+                    _ => false
+                }
             } else {
                 match ipa[i + 1] {
                     'ː' => true,
