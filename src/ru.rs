@@ -41,60 +41,43 @@ enum Phoneme {
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
 struct PhonemeSeq(Vec<Phoneme>);
 
-macro_rules! push_phoneme {
-    ($vec:ident, $is_long:ident, $phoneme:expr) => {
-        if $is_long {
-            $vec.push($phoneme);
-            $vec.push($phoneme);
-        } else {
-            $vec.push($phoneme);
-        }
-    };
-}
-
-macro_rules! push_vowel {
-    ($vec:ident, $is_long:ident, $phoneme:ident) => {
-        push_phoneme!($vec, $is_long, Phoneme::Vowel { phoneme: Vowels::$phoneme })
-    };
-}
-
-macro_rules! push_consonant {
-    ($vec:ident, $is_long:ident, $is_palatalized:ident, $phoneme:ident) => {
-        push_phoneme!($vec, $is_long, Phoneme::Consonant { phoneme: Consonants::$phoneme, $is_palatalized })
-    };
-}
-
-macro_rules! push_palatalized_only_consonant {
-    ($vec:ident, $is_long:ident, $phoneme:ident) => {
-        push_phoneme!($vec, $is_long, Phoneme::PalatalizedOnlyConsonant { phoneme: PalatalizedOnlyConsonants::$phoneme })
-    };
-}
-
 impl PhonemeSeq {
     fn new(ipa: ipa::Ipa) -> Self {
         (&ipa).iter().fold(Self::default(), Self::next)
     }
 
     fn next(self, sound: &ipa::Sound) -> Self {
+        use ipa::{Consonants::*, Vowels::*};
+        use PalatalizedOnlyConsonants::*;
+        use Consonants::*;
+        use Phoneme::*;
+        use Vowels::*;
+
         let mut vec = self.0;
-        match *sound {
+        let next_sound = match *sound {
             ipa::Sound::Vowel { phoneme, is_long } => match phoneme {
-                ipa::Vowels::CloseBackRounded => push_vowel!(vec, is_long, U),
-                ipa::Vowels::CloseMidFrontRounded => push_vowel!(vec, is_long, O),
-                ipa::Vowels::MidCentral => push_vowel!(vec, is_long, A),
-                ipa::Vowels::NearOpenFrontUrounded => push_vowel!(vec, is_long, A),
-                ipa::Vowels::OpenBackUnrounded => push_vowel!(vec, is_long, A),
-                ipa::Vowels::OpenFrontUnrounded => push_vowel!(vec, is_long, A),
-                ipa::Vowels::OpenMidBackUnrounded => push_vowel!(vec, is_long, A),
+                CloseBackRounded      => (Vowel { phoneme: U }, is_long),
+                CloseMidFrontRounded  => (Vowel { phoneme: O }, is_long),
+                MidCentral            => (Vowel { phoneme: A }, is_long),
+                NearOpenFrontUrounded => (Vowel { phoneme: A }, is_long),
+                OpenBackUnrounded     => (Vowel { phoneme: A }, is_long),
+                OpenFrontUnrounded    => (Vowel { phoneme: A }, is_long),
+                OpenMidBackUnrounded  => (Vowel { phoneme: A }, is_long),
             },
             ipa::Sound::Consonant { phoneme, is_long, is_palatalized } => match phoneme {
-                ipa::Consonants::VoicedAlveolarNasal => push_consonant!(vec, is_long, is_palatalized, N),
-                ipa::Consonants::VoicedBilabialNasal => push_consonant!(vec, is_long, is_palatalized, M),
-                ipa::Consonants::VoicedPalatalApproximant => push_palatalized_only_consonant!(vec, is_long, J),
-                ipa::Consonants::VoicelessBilabialPlosive => push_consonant!(vec, is_long, is_palatalized, P),
+                VoicedAlveolarNasal      => (Consonant { phoneme: N, is_palatalized }, is_long),
+                VoicedBilabialNasal      => (Consonant { phoneme: M, is_palatalized }, is_long),
+                VoicedPalatalApproximant => (PalatalizedOnlyConsonant  { phoneme: J }, is_long),
+                VoicelessBilabialPlosive => (Consonant { phoneme: P, is_palatalized }, is_long),
             }
+        };
+        if next_sound.1 {
+            vec.push(next_sound.0);
+            vec.push(next_sound.0);
+        } else {
+            vec.push(next_sound.0);
         }
-        PhonemeSeq(vec)
+        Self(vec)
     }
 }
 
