@@ -14,11 +14,11 @@ struct Cli {
 }
 
 fn main() -> Result<(), ipa::Error> {
-    let ipa = Cli::parse().ipa;
-
-    let parsed_ipa = Ipa::new(&ipa)?;
-
-    println!("{}", Ru::new(parsed_ipa));
-
+    let russian = Some(&Cli::parse().ipa)
+        .map(String::as_str)
+        .map(Ipa::new)
+        .unwrap()
+        .map(Ru::new)?;
+    println!("{}", russian);
     Ok(())
 }
