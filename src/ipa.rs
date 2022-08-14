@@ -4,6 +4,7 @@ use std::{fmt, ops::Deref};
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd)]
 pub enum Vowels {
     CloseBackRounded,
+    CloseMidFrontRounded,
     MidCentral,
     NearOpenFrontUrounded,
     OpenBackUnrounded,
@@ -99,6 +100,7 @@ impl Ipa {
                 'p' => push_consonant!(vec, is_longing_next, is_palatalizizg_next, VoicelessBilabialPlosive),
 
                 'u' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, CloseBackRounded),
+                'ø' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, CloseMidFrontRounded),
                 'ə' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, MidCentral),
                 'æ' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, NearOpenFrontUrounded),
                 'ɑ' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, OpenBackUnrounded),

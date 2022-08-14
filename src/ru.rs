@@ -80,6 +80,7 @@ impl PhonemeSeq {
         match *sound {
             ipa::Sound::Vowel { phoneme, is_long } => match phoneme {
                 ipa::Vowels::CloseBackRounded => push_vowel!(vec, is_long, U),
+                ipa::Vowels::CloseMidFrontRounded => push_vowel!(vec, is_long, O),
                 ipa::Vowels::MidCentral => push_vowel!(vec, is_long, A),
                 ipa::Vowels::NearOpenFrontUrounded => push_vowel!(vec, is_long, A),
                 ipa::Vowels::OpenBackUnrounded => push_vowel!(vec, is_long, A),
