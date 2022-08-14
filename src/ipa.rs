@@ -3,12 +3,12 @@ use std::{fmt, ops::Deref};
 #[deny(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd)]
 pub enum Vowels {
-    CloseBackRoundedVowel,
-    MidCentralVowel,
-    NearOpenFrontUroundedVowel,
-    OpenBackUnroundedVowel,
-    OpenFrontUnroundedVowel,
-    OpenMidBackUnroundedVowel
+    CloseBackRounded,
+    MidCentral,
+    NearOpenFrontUrounded,
+    OpenBackUnrounded,
+    OpenFrontUnrounded,
+    OpenMidBackUnrounded
 }
 
 #[deny(dead_code)]
@@ -16,7 +16,8 @@ pub enum Vowels {
 pub enum Consonants {
     VoicedAlveolarNasal,
     VoicedBilabialNasal,
-    VoicedPalatalApproximant
+    VoicedPalatalApproximant,
+    VoicelessBilabialPlosive
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd)]
@@ -82,35 +83,27 @@ impl Ipa {
             let is_palatalizizg_next = if i == ipa.len() - 1 {
                 false
             } else {
-                match ipa[i + 1] {
-                    'ʲ' => true,
-                    _ => false
-                }
+                matches!(ipa[i + 1], 'ʲ')
             };
             let is_longing_next = if i == ipa.len() - 1 {
                 false
             } else if i < ipa.len() - 2 && is_palatalizizg_next {
-                match ipa[i + 2] {
-                    'ː' => true,
-                    _ => false
-                }
+                matches!(ipa[i + 2], 'ː')
             } else {
-                match ipa[i + 1] {
-                    'ː' => true,
-                    _ => false
-                }
+                matches!(ipa[i + 1], 'ː')
             };
             match ipa[i] {
                 'n' => push_consonant!(vec, is_longing_next, is_palatalizizg_next, VoicedAlveolarNasal),
                 'm' => push_consonant!(vec, is_longing_next, is_palatalizizg_next, VoicedBilabialNasal),
                 'j' => push_consonant!(vec, is_longing_next, is_palatalizizg_next, VoicedPalatalApproximant),
+                'p' => push_consonant!(vec, is_longing_next, is_palatalizizg_next, VoicelessBilabialPlosive),
 
-                'u' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, CloseBackRoundedVowel),
-                'ə' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, MidCentralVowel),
-                'æ' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, NearOpenFrontUroundedVowel),
-                'ɑ' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, OpenBackUnroundedVowel),
-                'a' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, OpenFrontUnroundedVowel),
-                'ʌ' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, OpenMidBackUnroundedVowel),
+                'u' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, CloseBackRounded),
+                'ə' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, MidCentral),
+                'æ' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, NearOpenFrontUrounded),
+                'ɑ' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, OpenBackUnrounded),
+                'a' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, OpenFrontUnrounded),
+                'ʌ' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, OpenMidBackUnrounded),
 
                 'ʲ' => continue,
                 'ː' => continue,
@@ -144,7 +137,7 @@ mod ipa_build_tests {
                     is_palatalized: true
                 },
                 Sound::Vowel {
-                    phoneme: Vowels::NearOpenFrontUroundedVowel,
+                    phoneme: Vowels::NearOpenFrontUrounded,
                     is_long: false
                 }
             ]))
@@ -156,7 +149,7 @@ mod ipa_build_tests {
     fn test_palatalized_vowel() {
         assert_eq!(
             Ipa::new("æʲ"),
-            Err(Error::PalatalizedVowel(Vowels::NearOpenFrontUroundedVowel))
+            Err(Error::PalatalizedVowel(Vowels::NearOpenFrontUrounded))
         );
         
     }

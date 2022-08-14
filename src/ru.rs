@@ -30,7 +30,7 @@ enum Phoneme {
     Probel
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Default)]
 struct PhonemeSeq(Vec<Phoneme>);
 
 macro_rules! push_phoneme {
@@ -64,33 +64,28 @@ macro_rules! push_palatalized_only_consonant {
 
 impl PhonemeSeq {
     fn new(ipa: ipa::Ipa) -> Self {
-        (&ipa).into_iter().fold(Self::default(), Self::next)
+        (&ipa).iter().fold(Self::default(), Self::next)
     }
 
     fn next(self, sound: &ipa::Sound) -> Self {
-        let mut vec = self.0.clone();
+        let mut vec = self.0;
         match *sound {
             ipa::Sound::Vowel { phoneme, is_long } => match phoneme {
-                ipa::Vowels::CloseBackRoundedVowel => push_vowel!(vec, is_long, U),
-                ipa::Vowels::MidCentralVowel => push_vowel!(vec, is_long, A),
-                ipa::Vowels::NearOpenFrontUroundedVowel => push_vowel!(vec, is_long, A),
-                ipa::Vowels::OpenBackUnroundedVowel => push_vowel!(vec, is_long, A),
-                ipa::Vowels::OpenFrontUnroundedVowel => push_vowel!(vec, is_long, A),
-                ipa::Vowels::OpenMidBackUnroundedVowel => push_vowel!(vec, is_long, A),
+                ipa::Vowels::CloseBackRounded => push_vowel!(vec, is_long, U),
+                ipa::Vowels::MidCentral => push_vowel!(vec, is_long, A),
+                ipa::Vowels::NearOpenFrontUrounded => push_vowel!(vec, is_long, A),
+                ipa::Vowels::OpenBackUnrounded => push_vowel!(vec, is_long, A),
+                ipa::Vowels::OpenFrontUnrounded => push_vowel!(vec, is_long, A),
+                ipa::Vowels::OpenMidBackUnrounded => push_vowel!(vec, is_long, A),
             },
             ipa::Sound::Consonant { phoneme, is_long, is_palatalized } => match phoneme {
                 ipa::Consonants::VoicedAlveolarNasal => push_consonant!(vec, is_long, is_palatalized, N),
                 ipa::Consonants::VoicedBilabialNasal => push_consonant!(vec, is_long, is_palatalized, M),
                 ipa::Consonants::VoicedPalatalApproximant => push_palatalized_only_consonant!(vec, is_long, J),
+                ipa::Consonants::VoicelessBilabialPlosive => push_consonant!(vec, is_long, is_palatalized, P),
             }
         }
         PhonemeSeq(vec)
-    }
-}
-
-impl Default for PhonemeSeq {
-    fn default() -> Self {
-        PhonemeSeq(vec![])
     }
 }
 
@@ -131,17 +126,10 @@ impl fmt::Display for PhonemeSeq {
                 _ => match self.0[i - 1] {
                     Phoneme::Vowel { phoneme: _ } => false,
                     Phoneme::Consonant { phoneme, is_palatalized } => match phoneme {
-                        Consonants::W => if is_palatalized {
-                            true
-                        } else {
-                            false
-                        },
+                        Consonants::W => is_palatalized,
                         _ => false
                     },
-                    Phoneme::PalatalizedOnlyConsonant { phoneme } => match phoneme {
-                        PalatalizedOnlyConsonants::Q => true,
-                        _ => false
-                    },
+                    Phoneme::PalatalizedOnlyConsonant { phoneme } => matches!(phoneme, PalatalizedOnlyConsonants::Q),
                     Phoneme::Probel => false
                 }
             };
