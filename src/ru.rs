@@ -1,6 +1,14 @@
 use std::fmt;
 use crate::ipa;
 
+fn either<T>(which: bool, if_false: T, if_true: T) -> T {
+    if which {
+        if_true
+    } else {
+        if_false
+    }
+}
+
 #[allow(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Vowels {
@@ -163,11 +171,8 @@ impl fmt::Display for PhonemeSeq {
                         Consonants::G => { write!(formatter, "г")?; },
                         Consonants::T => { write!(formatter, "т")?; },
                         Consonants::D => { write!(formatter, "д")?; },
-                        Consonants::W => if is_palatalized {
-                            write!(formatter, "щ")?;
-                        } else {
-                            write!(formatter, "ш")?;
-                        },
+                        Consonants::W => { write!(formatter, "{}",
+                                either(is_palatalized, "ш", "щ"))?; },
                         Consonants::X => { write!(formatter, "ж")?; },
                         Consonants::S => { write!(formatter, "с")?; },
                         Consonants::Z => { write!(formatter, "з")?; },
