@@ -97,6 +97,14 @@ impl PhonemeSeq {
     }
 }
 
+macro_rules! write_letter {
+    ($formatter:ident, $letter:expr) => {
+        {
+            write!($formatter, "{}", $letter)?;
+        }
+    };
+}
+
 #[deny(unused_must_use)]
 impl fmt::Display for PhonemeSeq {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -145,57 +153,56 @@ impl fmt::Display for PhonemeSeq {
                 Phoneme::Vowel { phoneme } => {
                     if is_prev_palatalized && !is_q_or_wj_prev {
                         match phoneme {
-                            Vowels::A => { write!(formatter, "я")?; },
-                            Vowels::E => { write!(formatter, "е")?; },
-                            Vowels::I => { write!(formatter, "и")?; },
-                            Vowels::O => { write!(formatter, "ё")?; },
-                            Vowels::U => { write!(formatter, "ю")?; },
+                            Vowels::A => write_letter!(formatter, "я"),
+                            Vowels::E => write_letter!(formatter, "е"),
+                            Vowels::I => write_letter!(formatter, "и"),
+                            Vowels::O => write_letter!(formatter, "ё"),
+                            Vowels::U => write_letter!(formatter, "ю"),
                         }
                     } else {
                         match phoneme {
-                            Vowels::A => { write!(formatter, "а")?; },
-                            Vowels::E => { write!(formatter, "э")?; },
-                            Vowels::I => { write!(formatter, "ы")?; },
-                            Vowels::O => { write!(formatter, "о")?; },
-                            Vowels::U => { write!(formatter, "у")?; },
+                            Vowels::A => write_letter!(formatter, "а"),
+                            Vowels::E => write_letter!(formatter, "э"),
+                            Vowels::I => write_letter!(formatter, "ы"),
+                            Vowels::O => write_letter!(formatter, "о"),
+                            Vowels::U => write_letter!(formatter, "у"),
                         }
                     }
                 },
                 Phoneme::Consonant {phoneme, is_palatalized } => {
                     match phoneme {
-                        Consonants::P => { write!(formatter, "п")?; },
-                        Consonants::B => { write!(formatter, "б")?; },
-                        Consonants::F => { write!(formatter, "ф")?; },
-                        Consonants::V => { write!(formatter, "в")?; },
-                        Consonants::K => { write!(formatter, "к")?; },
-                        Consonants::G => { write!(formatter, "г")?; },
-                        Consonants::T => { write!(formatter, "т")?; },
-                        Consonants::D => { write!(formatter, "д")?; },
-                        Consonants::W => { write!(formatter, "{}",
-                                either(is_palatalized, "ш", "щ"))?; },
-                        Consonants::X => { write!(formatter, "ж")?; },
-                        Consonants::S => { write!(formatter, "с")?; },
-                        Consonants::Z => { write!(formatter, "з")?; },
-                        Consonants::L => { write!(formatter, "л")?; },
-                        Consonants::M => { write!(formatter, "м")?; },
-                        Consonants::N => { write!(formatter, "н")?; },
-                        Consonants::R => { write!(formatter, "р")?; },
-                        Consonants::H => { write!(formatter, "х")?; },
-                        Consonants::C => { write!(formatter, "с")?; },
+                        Consonants::P => write_letter!(formatter, "п"),
+                        Consonants::B => write_letter!(formatter, "б"),
+                        Consonants::F => write_letter!(formatter, "ф"),
+                        Consonants::V => write_letter!(formatter, "в"),
+                        Consonants::K => write_letter!(formatter, "к"),
+                        Consonants::G => write_letter!(formatter, "г"),
+                        Consonants::T => write_letter!(formatter, "т"),
+                        Consonants::D => write_letter!(formatter, "д"),
+                        Consonants::W => write_letter!(formatter, either(is_palatalized, "ш", "щ")),
+                        Consonants::X => write_letter!(formatter, "ж"),
+                        Consonants::S => write_letter!(formatter, "с"),
+                        Consonants::Z => write_letter!(formatter, "з"),
+                        Consonants::L => write_letter!(formatter, "л"),
+                        Consonants::M => write_letter!(formatter, "м"),
+                        Consonants::N => write_letter!(formatter, "н"),
+                        Consonants::R => write_letter!(formatter, "р"),
+                        Consonants::H => write_letter!(formatter, "х"),
+                        Consonants::C => write_letter!(formatter, "с"),
                     }
                     if is_palatalized && !is_vowel_next {
-                        write!(formatter, "ь")?;
+                        write_letter!(formatter, "ь");
                     }
                 },
                 Phoneme::PalatalizedOnlyConsonant { phoneme } => match phoneme {
                     PalatalizedOnlyConsonants::J => if is_vowel_next && is_consonant_prev {
-                        write!(formatter, "ъ")?;
+                        write_letter!(formatter, "ъ");
                     } else if !is_vowel_next {
-                        write!(formatter, "й")?;
+                        write_letter!(formatter, "й");
                     },
-                    PalatalizedOnlyConsonants::Q => { write!(formatter, "ч")?; }
+                    PalatalizedOnlyConsonants::Q => write_letter!(formatter, "ч")
                 },
-                Phoneme::Probel => { write!(formatter, " ")?; }
+                Phoneme::Probel => write_letter!(formatter, " ")
             }
         }
         Ok(())
@@ -213,7 +220,7 @@ impl Ru {
 
 impl fmt::Display for Ru {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(formatter, "{}", self.0)
+        self.0.fmt(formatter)
     }
 }
 
