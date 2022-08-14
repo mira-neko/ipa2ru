@@ -98,20 +98,6 @@ impl PhonemeSeq {
     }
 }
 
-macro_rules! write_letter {
-    ($formatter:ident, $letter:expr) => {
-        {
-            write!($formatter, "{}", $letter)?;
-        }
-    };
-}
-
-macro_rules! write_either_letter {
-    ($formatter:ident, $which:ident, $letter_false:expr, $letter_true:expr) => {
-        write_letter!($formatter, either($which, $letter_false, $letter_true))
-    };
-}
-
 #[deny(unused_must_use)]
 impl fmt::Display for PhonemeSeq {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -156,52 +142,52 @@ impl fmt::Display for PhonemeSeq {
                     Phoneme::Probel => false
                 }
             };
-            match self.0[i] {
+            write!(formatter, "{}", match self.0[i] {
                 Phoneme::Vowel { phoneme } => {
                     let is_vowel_palatalizing = is_prev_palatalized && !is_q_or_wj_prev;
                     match phoneme {
-                        Vowels::A => write_either_letter!(formatter, is_vowel_palatalizing, "а", "я"),
-                        Vowels::E => write_either_letter!(formatter, is_vowel_palatalizing, "э", "е"),
-                        Vowels::I => write_either_letter!(formatter, is_vowel_palatalizing, "ы", "и"),
-                        Vowels::O => write_either_letter!(formatter, is_vowel_palatalizing, "о", "ё"),
-                        Vowels::U => write_either_letter!(formatter, is_vowel_palatalizing, "у", "ю"),
+                        Vowels::A => either(is_vowel_palatalizing, "а", "я"),
+                        Vowels::E => either(is_vowel_palatalizing, "э", "е"),
+                        Vowels::I => either(is_vowel_palatalizing, "ы", "и"),
+                        Vowels::O => either(is_vowel_palatalizing, "о", "ё"),
+                        Vowels::U => either(is_vowel_palatalizing, "у", "ю"),
                     }
                 },
                 Phoneme::Consonant {phoneme, is_palatalized } => {
+                    let is_jer = is_palatalized && !is_vowel_next;
                     match phoneme {
-                        Consonants::P => write_letter!(formatter, "п"),
-                        Consonants::B => write_letter!(formatter, "б"),
-                        Consonants::F => write_letter!(formatter, "ф"),
-                        Consonants::V => write_letter!(formatter, "в"),
-                        Consonants::K => write_letter!(formatter, "к"),
-                        Consonants::G => write_letter!(formatter, "г"),
-                        Consonants::T => write_letter!(formatter, "т"),
-                        Consonants::D => write_letter!(formatter, "д"),
-                        Consonants::W => write_either_letter!(formatter, is_palatalized, "ш", "щ"),
-                        Consonants::X => write_letter!(formatter, "ж"),
-                        Consonants::S => write_letter!(formatter, "с"),
-                        Consonants::Z => write_letter!(formatter, "з"),
-                        Consonants::L => write_letter!(formatter, "л"),
-                        Consonants::M => write_letter!(formatter, "м"),
-                        Consonants::N => write_letter!(formatter, "н"),
-                        Consonants::R => write_letter!(formatter, "р"),
-                        Consonants::H => write_letter!(formatter, "х"),
-                        Consonants::C => write_letter!(formatter, "с"),
-                    }
-                    if is_palatalized && !is_vowel_next {
-                        write_letter!(formatter, "ь");
+                        Consonants::P => either(is_jer, "п", "пь"),
+                        Consonants::B => either(is_jer, "б", "бь"),
+                        Consonants::F => either(is_jer, "ф", "фь"),
+                        Consonants::V => either(is_jer, "в", "вь"),
+                        Consonants::K => either(is_jer, "к", "кь"),
+                        Consonants::G => either(is_jer, "г", "гь"),
+                        Consonants::T => either(is_jer, "т", "ть"),
+                        Consonants::D => either(is_jer, "д", "дь"),
+                        Consonants::W => either(is_palatalized, "ш", "щ" ),
+                        Consonants::X => either(is_jer, "ж", "жь"),
+                        Consonants::S => either(is_jer, "с", "сь"),
+                        Consonants::Z => either(is_jer, "з", "зь"),
+                        Consonants::L => either(is_jer, "л", "ль"),
+                        Consonants::M => either(is_jer, "м", "мь"),
+                        Consonants::N => either(is_jer, "н", "нь"),
+                        Consonants::R => either(is_jer, "р", "рь"),
+                        Consonants::H => either(is_jer, "х", "хь"),
+                        Consonants::C => either(is_jer, "с", "сь"),
                     }
                 },
                 Phoneme::PalatalizedOnlyConsonant { phoneme } => match phoneme {
                     PalatalizedOnlyConsonants::J => if is_vowel_next && is_consonant_prev {
-                        write_letter!(formatter, "ъ");
+                        "ъ"
                     } else if !is_vowel_next {
-                        write_letter!(formatter, "й");
+                        "й"
+                    } else {
+                        ""
                     },
-                    PalatalizedOnlyConsonants::Q => write_letter!(formatter, "ч")
+                    PalatalizedOnlyConsonants::Q => "ч"
                 },
-                Phoneme::Probel => write_letter!(formatter, " ")
-            }
+                Phoneme::Probel => " "
+            })?;
         }
         Ok(())
     }
