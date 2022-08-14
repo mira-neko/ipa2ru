@@ -229,7 +229,7 @@ mod ru_phoneme_seq_fmt_tests {
     use super::*;
 
     #[test]
-    fn test_nja() {
+    fn test_na() {
         assert_eq!(format!("{}", PhonemeSeq(vec![
             Phoneme::Consonant { phoneme: Consonants::N, is_palatalized: true },
             Phoneme::Vowel { phoneme: Vowels::A },
@@ -259,7 +259,7 @@ mod ru_phoneme_seq_fmt_tests {
     }
 
     #[test]
-    fn test_intervokalnyj_jot() {
+    fn test_intervokalnij_jot() {
         assert_eq!(format!("{}", PhonemeSeq(vec![
             Phoneme::Vowel { phoneme: Vowels::A },
             Phoneme::Consonant { phoneme: Consonants::H, is_palatalized: false },
@@ -271,7 +271,7 @@ mod ru_phoneme_seq_fmt_tests {
     }
 
     #[test]
-    fn test_nacqalnyj_jot() {
+    fn test_naqalnij_jot() {
         assert_eq!(format!("{}", PhonemeSeq(vec![
             Phoneme::PalatalizedOnlyConsonant { phoneme: PalatalizedOnlyConsonants::J },
             Phoneme::Vowel { phoneme: Vowels::E },
@@ -282,7 +282,7 @@ mod ru_phoneme_seq_fmt_tests {
     }
 
     #[test]
-    fn test_squsxa() {
+    fn test_wuwa() {
         assert_eq!(format!("{}", PhonemeSeq(vec![
             Phoneme::Consonant { phoneme: Consonants::W, is_palatalized: true },
             Phoneme::Vowel { phoneme: Vowels::U },
@@ -292,7 +292,7 @@ mod ru_phoneme_seq_fmt_tests {
     }
 
     #[test]
-    fn test_cqakra() {
+    fn test_qakra() {
         assert_eq!(format!("{}", PhonemeSeq(vec![
             Phoneme::PalatalizedOnlyConsonant { phoneme: PalatalizedOnlyConsonants::Q },
             Phoneme::Vowel { phoneme: Vowels::A },
@@ -308,7 +308,7 @@ mod ru_integration_tests {
     use super::*;
 
     #[test]
-    fn test_nja() {
+    fn test_na() {
         assert_eq!(
             format!("{}", Ru::new(ipa::Ipa::new("nʲæ").unwrap())),
             "ня"
@@ -316,7 +316,7 @@ mod ru_integration_tests {
     }
 
     #[test]
-    fn test_mjaau() {
+    fn test_maau() {
         assert_eq!(
             format!("{}", Ru::new(ipa::Ipa::new("mʲæːu").unwrap())),
             "мяау"
@@ -324,7 +324,7 @@ mod ru_integration_tests {
     }
 
     #[test]
-    fn test_mmjaau() {
+    fn test_mmaau() {
         assert_eq!(
             format!("{}", Ru::new(ipa::Ipa::new("mʲːæːu").unwrap())),
             "мьмяау"

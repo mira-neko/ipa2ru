@@ -127,7 +127,7 @@ mod ipa_build_tests {
     use super::*;
 
     #[test]
-    fn test_nja() {
+    fn test_na() {
         assert_eq!(
             Ipa::new("nʲæ"),
             Ok(Ipa(vec![
