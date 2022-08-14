@@ -1,5 +1,4 @@
 use std::{fmt, ops::Deref};
-use crate::misc::*;
 
 #[deny(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd)]
@@ -76,13 +75,13 @@ impl Ipa {
                 'j' => Some(Consonant { phoneme: VoicedPalatalApproximant, is_long, is_palatalized }),
                 'p' => Some(Consonant { phoneme: VoicelessBilabialPlosive, is_long, is_palatalized }),
 
-                'u' => Some(either(is_palatalized, Ok(Vowel { phoneme: CloseBackRounded,      is_long }), Err(PalatalizedVowel(ipa[i])))?),
-                'ø' => Some(either(is_palatalized, Ok(Vowel { phoneme: CloseMidFrontRounded,  is_long }), Err(PalatalizedVowel(ipa[i])))?),
-                'ə' => Some(either(is_palatalized, Ok(Vowel { phoneme: MidCentral,            is_long }), Err(PalatalizedVowel(ipa[i])))?),
-                'æ' => Some(either(is_palatalized, Ok(Vowel { phoneme: NearOpenFrontUrounded, is_long }), Err(PalatalizedVowel(ipa[i])))?),
-                'ɑ' => Some(either(is_palatalized, Ok(Vowel { phoneme: OpenBackUnrounded,     is_long }), Err(PalatalizedVowel(ipa[i])))?),
-                'a' => Some(either(is_palatalized, Ok(Vowel { phoneme: OpenFrontUnrounded,    is_long }), Err(PalatalizedVowel(ipa[i])))?),
-                'ʌ' => Some(either(is_palatalized, Ok(Vowel { phoneme: OpenMidBackUnrounded,  is_long }), Err(PalatalizedVowel(ipa[i])))?),
+                'u' => if is_palatalized { return Err(PalatalizedVowel(ipa[i])); } else { Some(Vowel { phoneme: CloseBackRounded,      is_long }) },
+                'ø' => if is_palatalized { return Err(PalatalizedVowel(ipa[i])); } else { Some(Vowel { phoneme: CloseMidFrontRounded,  is_long }) },
+                'ə' => if is_palatalized { return Err(PalatalizedVowel(ipa[i])); } else { Some(Vowel { phoneme: MidCentral,            is_long }) },
+                'æ' => if is_palatalized { return Err(PalatalizedVowel(ipa[i])); } else { Some(Vowel { phoneme: NearOpenFrontUrounded, is_long }) },
+                'ɑ' => if is_palatalized { return Err(PalatalizedVowel(ipa[i])); } else { Some(Vowel { phoneme: OpenBackUnrounded,     is_long }) },
+                'a' => if is_palatalized { return Err(PalatalizedVowel(ipa[i])); } else { Some(Vowel { phoneme: OpenFrontUnrounded,    is_long }) },
+                'ʌ' => if is_palatalized { return Err(PalatalizedVowel(ipa[i])); } else { Some(Vowel { phoneme: OpenMidBackUnrounded,  is_long }) },
 
                 'ʲ' => None,
                 'ː' => None,

@@ -1,5 +1,5 @@
 use std::fmt;
-use crate::{ipa, misc::*};
+use crate::ipa;
 
 #[allow(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -121,34 +121,34 @@ impl fmt::Display for PhonemeSeq {
                 Phoneme::Vowel { phoneme } => {
                     let is_vowel_palatalizing = is_prev_palatalized && !is_q_or_wj_prev;
                     match phoneme {
-                        Vowels::A => either(is_vowel_palatalizing, "а", "я"),
-                        Vowels::E => either(is_vowel_palatalizing, "э", "е"),
-                        Vowels::I => either(is_vowel_palatalizing, "ы", "и"),
-                        Vowels::O => either(is_vowel_palatalizing, "о", "ё"),
-                        Vowels::U => either(is_vowel_palatalizing, "у", "ю"),
+                        Vowels::A => if is_vowel_palatalizing { "я" } else { "а" },
+                        Vowels::E => if is_vowel_palatalizing { "е" } else { "э" },
+                        Vowels::I => if is_vowel_palatalizing { "и" } else { "ы" },
+                        Vowels::O => if is_vowel_palatalizing { "ё" } else { "о" },
+                        Vowels::U => if is_vowel_palatalizing { "ю" } else { "у" },
                     }
                 },
                 Phoneme::Consonant {phoneme, is_palatalized } => {
                     let is_jer = is_palatalized && !is_vowel_next;
                     match phoneme {
-                        Consonants::P => either(is_jer, "п", "пь"),
-                        Consonants::B => either(is_jer, "б", "бь"),
-                        Consonants::F => either(is_jer, "ф", "фь"),
-                        Consonants::V => either(is_jer, "в", "вь"),
-                        Consonants::K => either(is_jer, "к", "кь"),
-                        Consonants::G => either(is_jer, "г", "гь"),
-                        Consonants::T => either(is_jer, "т", "ть"),
-                        Consonants::D => either(is_jer, "д", "дь"),
-                        Consonants::W => either(is_palatalized, "ш", "щ" ),
-                        Consonants::X => either(is_jer, "ж", "жь"),
-                        Consonants::S => either(is_jer, "с", "сь"),
-                        Consonants::Z => either(is_jer, "з", "зь"),
-                        Consonants::L => either(is_jer, "л", "ль"),
-                        Consonants::M => either(is_jer, "м", "мь"),
-                        Consonants::N => either(is_jer, "н", "нь"),
-                        Consonants::R => either(is_jer, "р", "рь"),
-                        Consonants::H => either(is_jer, "х", "хь"),
-                        Consonants::C => either(is_jer, "с", "сь"),
+                        Consonants::P => if is_jer { "пь" } else { "п" },
+                        Consonants::B => if is_jer { "бь" } else { "б" },
+                        Consonants::F => if is_jer { "фь" } else { "ф" },
+                        Consonants::V => if is_jer { "вь" } else { "в" },
+                        Consonants::K => if is_jer { "кь" } else { "к" },
+                        Consonants::G => if is_jer { "гь" } else { "г" },
+                        Consonants::T => if is_jer { "ть" } else { "т" },
+                        Consonants::D => if is_jer { "дь" } else { "д" },
+                        Consonants::W => if is_palatalized { "щ" } else { "ш" },
+                        Consonants::X => if is_jer { "жь" } else { "ж" },
+                        Consonants::S => if is_jer { "сь" } else { "с" },
+                        Consonants::Z => if is_jer { "зь" } else { "з" },
+                        Consonants::L => if is_jer { "ль" } else { "л" },
+                        Consonants::M => if is_jer { "мь" } else { "м" },
+                        Consonants::N => if is_jer { "нь" } else { "н" },
+                        Consonants::R => if is_jer { "рь" } else { "р" },
+                        Consonants::H => if is_jer { "хь" } else { "х" },
+                        Consonants::C => if is_jer { "сь" } else { "с" },
                     }
                 },
                 Phoneme::PalatalizedOnlyConsonant { phoneme } => match phoneme {
