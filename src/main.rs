@@ -1,8 +1,6 @@
-mod ipa;
 mod ru;
 
 use clap::Parser;
-use ipa::Ipa;
 use ru::Ru;
 
 #[derive(Parser)]
@@ -12,12 +10,7 @@ struct Cli {
     ipa: String,
 }
 
-fn main() -> Result<(), ipa::Error> {
-    let russian = Some(&Cli::parse().ipa)
-        .map(String::as_str)
-        .map(Ipa::new)
-        .unwrap()
-        .map(Ru::new)?;
-    println!("{}", russian);
+fn main() -> Result<(), ipa_sounds::Error> {
+    println!("{}", Ru::from(Cli::parse().ipa.as_str()));
     Ok(())
 }

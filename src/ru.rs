@@ -1,5 +1,5 @@
 use std::fmt;
-use crate::ipa;
+use ipa_sounds;
 
 #[allow(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -34,12 +34,12 @@ enum Phoneme {
 struct PhonemeSeq(Vec<Phoneme>);
 
 impl PhonemeSeq {
-    fn new(ipa: ipa::Ipa) -> Self {
+    fn new(ipa: ipa_sounds::Ipa) -> Self {
         (&ipa).iter().fold(Self::default(), Self::next)
     }
 
-    fn next(self, sound: &ipa::Sound) -> Self {
-        use ipa::{Consonants::*, Vowels::*};
+    fn next(self, sound: &ipa_sounds::Sound) -> Self {
+        use ipa_sounds::{Consonants::*, Vowels::*};
         use PalatalizedOnlyConsonants::*;
         use Consonants::*;
         use Phoneme::*;
@@ -47,7 +47,7 @@ impl PhonemeSeq {
 
         let mut vec = self.0;
         let next_sound = match *sound {
-            ipa::Sound::Vowel { phoneme, is_long } => match phoneme {
+            ipa_sounds::Sound::Vowel { phoneme, is_long } => match phoneme {
                 CloseBackRounded      => (Vowel { phoneme: U }, is_long),
                 CloseMidFrontRounded  => (Vowel { phoneme: O }, is_long),
                 MidCentral            => (Vowel { phoneme: A }, is_long),
@@ -56,12 +56,13 @@ impl PhonemeSeq {
                 OpenFrontUnrounded    => (Vowel { phoneme: A }, is_long),
                 OpenMidBackUnrounded  => (Vowel { phoneme: A }, is_long),
             },
-            ipa::Sound::Consonant { phoneme, is_long, is_palatalized } => match phoneme {
+            ipa_sounds::Sound::Consonant { phoneme, is_long, is_palatalized } => match phoneme {
                 VoicedAlveolarNasal      => (Consonant { phoneme: N, is_palatalized }, is_long),
                 VoicedBilabialNasal      => (Consonant { phoneme: M, is_palatalized }, is_long),
                 VoicedPalatalApproximant => (PalatalizedOnlyConsonant  { phoneme: J }, is_long),
                 VoicelessBilabialPlosive => (Consonant { phoneme: P, is_palatalized }, is_long),
-            }
+            },
+            ipa_sounds::Sound::Space => (Phoneme::Probel, false)
         };
         if next_sound.1 {
             vec.push(next_sound.0);
@@ -172,7 +173,7 @@ impl fmt::Display for PhonemeSeq {
 pub struct Ru(PhonemeSeq);
 
 impl Ru {
-    pub fn new(ipa: ipa::Ipa) -> Self {
+    pub fn new(ipa: ipa_sounds::Ipa) -> Self {
         Ru(PhonemeSeq::new(ipa))
     }
 }
@@ -180,6 +181,12 @@ impl Ru {
 impl fmt::Display for Ru {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(formatter)
+    }
+}
+
+impl From<&str> for Ru {
+    fn from(ipa_str: &str) -> Self {
+        Self::new(ipa_sounds::Ipa::new(ipa_str).unwrap())
     }
 }
 
@@ -269,15 +276,23 @@ mod ru_integration_tests {
     #[test]
     fn test_na() {
         assert_eq!(
-            format!("{}", Ru::new(ipa::Ipa::new("nʲæ").unwrap())),
+            format!("{}", Ru::new(ipa_sounds::Ipa::new("nʲæ").unwrap())),
             "ня"
+        );
+    }
+
+    #[test]
+    fn test_na_nan() {
+        assert_eq!(
+            format!("{}", Ru::new(ipa_sounds::Ipa::new("nʲæ nʲæn").unwrap())),
+            "ня нян"
         );
     }
 
     #[test]
     fn test_maau() {
         assert_eq!(
-            format!("{}", Ru::new(ipa::Ipa::new("mʲæːu").unwrap())),
+            format!("{}", Ru::new(ipa_sounds::Ipa::new("mʲæːu").unwrap())),
             "мяау"
         );
     }
@@ -285,7 +300,7 @@ mod ru_integration_tests {
     #[test]
     fn test_mmaau() {
         assert_eq!(
-            format!("{}", Ru::new(ipa::Ipa::new("mʲːæːu").unwrap())),
+            format!("{}", Ru::new(ipa_sounds::Ipa::new("mʲːæːu").unwrap())),
             "мьмяау"
         );
     }
