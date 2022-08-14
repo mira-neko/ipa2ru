@@ -8,4 +8,4 @@ license = "MIT"
 
 [dependencies]
 clap = { version = "3.2.16", features = ["derive"] }
-ipa-sounds = { path = "../ipa-sounds" }
+ipa-sounds = { git = "https://github.com/miralushch/ipa-sounds" }
