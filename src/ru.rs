@@ -105,6 +105,12 @@ macro_rules! write_letter {
     };
 }
 
+macro_rules! write_either_letter {
+    ($formatter:ident, $which:ident, $letter_false:expr, $letter_true:expr) => {
+        write_letter!($formatter, either($which, $letter_false, $letter_true))
+    };
+}
+
 #[deny(unused_must_use)]
 impl fmt::Display for PhonemeSeq {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -151,22 +157,13 @@ impl fmt::Display for PhonemeSeq {
             };
             match self.0[i] {
                 Phoneme::Vowel { phoneme } => {
-                    if is_prev_palatalized && !is_q_or_wj_prev {
-                        match phoneme {
-                            Vowels::A => write_letter!(formatter, "я"),
-                            Vowels::E => write_letter!(formatter, "е"),
-                            Vowels::I => write_letter!(formatter, "и"),
-                            Vowels::O => write_letter!(formatter, "ё"),
-                            Vowels::U => write_letter!(formatter, "ю"),
-                        }
-                    } else {
-                        match phoneme {
-                            Vowels::A => write_letter!(formatter, "а"),
-                            Vowels::E => write_letter!(formatter, "э"),
-                            Vowels::I => write_letter!(formatter, "ы"),
-                            Vowels::O => write_letter!(formatter, "о"),
-                            Vowels::U => write_letter!(formatter, "у"),
-                        }
+                    let is_vowel_palatalizing = is_prev_palatalized && !is_q_or_wj_prev;
+                    match phoneme {
+                        Vowels::A => write_either_letter!(formatter, is_vowel_palatalizing, "а", "я"),
+                        Vowels::E => write_either_letter!(formatter, is_vowel_palatalizing, "э", "е"),
+                        Vowels::I => write_either_letter!(formatter, is_vowel_palatalizing, "ы", "и"),
+                        Vowels::O => write_either_letter!(formatter, is_vowel_palatalizing, "о", "ё"),
+                        Vowels::U => write_either_letter!(formatter, is_vowel_palatalizing, "у", "ю"),
                     }
                 },
                 Phoneme::Consonant {phoneme, is_palatalized } => {
@@ -179,7 +176,7 @@ impl fmt::Display for PhonemeSeq {
                         Consonants::G => write_letter!(formatter, "г"),
                         Consonants::T => write_letter!(formatter, "т"),
                         Consonants::D => write_letter!(formatter, "д"),
-                        Consonants::W => write_letter!(formatter, either(is_palatalized, "ш", "щ")),
+                        Consonants::W => write_either_letter!(formatter, is_palatalized, "ш", "щ"),
                         Consonants::X => write_letter!(formatter, "ж"),
                         Consonants::S => write_letter!(formatter, "с"),
                         Consonants::Z => write_letter!(formatter, "з"),
