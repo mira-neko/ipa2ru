@@ -1,4 +1,5 @@
 use std::{fmt, ops::Deref};
+use crate::misc::*;
 
 #[deny(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd)]
@@ -33,83 +34,62 @@ pub struct Ipa(Vec<Sound>);
 #[allow(dead_code)]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Error {
-    PalatalizedVowel(Vowels)
+    PalatalizedVowel(char)
 }
 
 impl fmt::Debug for Error {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Error::PalatalizedVowel(vowel) => {
-                write!(formatter, "Vowel ({:?}) cannot be palatalized", vowel)?;
+                write!(formatter, "Vowel ({}) cannot be palatalized", vowel)?;
             }
         }
         Ok(())
     }
 }
 
-macro_rules! push_sound {
-    ($vec:ident, $phoneme:expr) => {
-        $vec.push($phoneme)
-    };
-}
-
-macro_rules! push_vowel {
-    ($vec:ident, $is_long:ident, $is_palatalizizg_next:ident, $phoneme:ident) => {
-        if $is_palatalizizg_next {
-            return Err(Error::PalatalizedVowel(Vowels::$phoneme))
-        } else {
-            push_sound!($vec, Sound::Vowel {
-                phoneme: Vowels::$phoneme,
-                is_long: $is_long,
-            })
-        }
-    };
-}
-
-macro_rules! push_consonant {
-    ($vec:ident, $is_long:ident, $is_palatalizizg_next:ident, $phoneme:ident) => {
-        push_sound!($vec, Sound::Consonant {
-            phoneme: Consonants::$phoneme,
-            is_long: $is_long,
-            is_palatalized: $is_palatalizizg_next
-        })
-    };
-}
-
 impl Ipa {
     pub fn new(ipa: &str) -> Result<Self, Error> {
+        use Sound::*;
+        use Consonants::*;
+        use Vowels::*;
+        use Error::*;
+
         let ipa: Vec<_> = ipa.chars().collect();
         let mut vec = Vec::with_capacity(ipa.len());
         for i in 0..ipa.len() {
-            let is_palatalizizg_next = if i == ipa.len() - 1 {
+            let is_palatalized = if i == ipa.len() - 1 {
                 false
             } else {
                 matches!(ipa[i + 1], 'ʲ')
             };
-            let is_longing_next = if i == ipa.len() - 1 {
+            let is_long = if i == ipa.len() - 1 {
                 false
-            } else if i < ipa.len() - 2 && is_palatalizizg_next {
+            } else if i < ipa.len() - 2 && is_palatalized {
                 matches!(ipa[i + 2], 'ː')
             } else {
                 matches!(ipa[i + 1], 'ː')
             };
-            match ipa[i] {
-                'n' => push_consonant!(vec, is_longing_next, is_palatalizizg_next, VoicedAlveolarNasal),
-                'm' => push_consonant!(vec, is_longing_next, is_palatalizizg_next, VoicedBilabialNasal),
-                'j' => push_consonant!(vec, is_longing_next, is_palatalizizg_next, VoicedPalatalApproximant),
-                'p' => push_consonant!(vec, is_longing_next, is_palatalizizg_next, VoicelessBilabialPlosive),
+            let sound = match ipa[i] {
+                'n' => Some(Consonant { phoneme: VoicedAlveolarNasal,      is_long, is_palatalized }),
+                'm' => Some(Consonant { phoneme: VoicedBilabialNasal,      is_long, is_palatalized }),
+                'j' => Some(Consonant { phoneme: VoicedPalatalApproximant, is_long, is_palatalized }),
+                'p' => Some(Consonant { phoneme: VoicelessBilabialPlosive, is_long, is_palatalized }),
 
-                'u' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, CloseBackRounded),
-                'ø' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, CloseMidFrontRounded),
-                'ə' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, MidCentral),
-                'æ' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, NearOpenFrontUrounded),
-                'ɑ' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, OpenBackUnrounded),
-                'a' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, OpenFrontUnrounded),
-                'ʌ' => push_vowel!(vec, is_longing_next, is_palatalizizg_next, OpenMidBackUnrounded),
+                'u' => Some(either(is_palatalized, Ok(Vowel { phoneme: CloseBackRounded,      is_long }), Err(PalatalizedVowel(ipa[i])))?),
+                'ø' => Some(either(is_palatalized, Ok(Vowel { phoneme: CloseMidFrontRounded,  is_long }), Err(PalatalizedVowel(ipa[i])))?),
+                'ə' => Some(either(is_palatalized, Ok(Vowel { phoneme: MidCentral,            is_long }), Err(PalatalizedVowel(ipa[i])))?),
+                'æ' => Some(either(is_palatalized, Ok(Vowel { phoneme: NearOpenFrontUrounded, is_long }), Err(PalatalizedVowel(ipa[i])))?),
+                'ɑ' => Some(either(is_palatalized, Ok(Vowel { phoneme: OpenBackUnrounded,     is_long }), Err(PalatalizedVowel(ipa[i])))?),
+                'a' => Some(either(is_palatalized, Ok(Vowel { phoneme: OpenFrontUnrounded,    is_long }), Err(PalatalizedVowel(ipa[i])))?),
+                'ʌ' => Some(either(is_palatalized, Ok(Vowel { phoneme: OpenMidBackUnrounded,  is_long }), Err(PalatalizedVowel(ipa[i])))?),
 
-                'ʲ' => continue,
-                'ː' => continue,
+                'ʲ' => None,
+                'ː' => None,
                 _ => todo!()
+            };
+            if let Some(to_push) = sound {
+                vec.push(to_push);
             }
         }
         Ok(Ipa(vec))
@@ -151,7 +131,7 @@ mod ipa_build_tests {
     fn test_palatalized_vowel() {
         assert_eq!(
             Ipa::new("æʲ"),
-            Err(Error::PalatalizedVowel(Vowels::NearOpenFrontUrounded))
+            Err(Error::PalatalizedVowel('æ'))
         );
         
     }

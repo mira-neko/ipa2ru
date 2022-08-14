@@ -1,13 +1,5 @@
 use std::fmt;
-use crate::ipa;
-
-fn either<T>(which: bool, if_false: T, if_true: T) -> T {
-    if which {
-        if_true
-    } else {
-        if_false
-    }
-}
+use crate::{ipa, misc::*};
 
 #[allow(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
