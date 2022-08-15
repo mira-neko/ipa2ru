@@ -7,5 +7,5 @@ authors = ["Мира Лущаева <miralushch@gmail.com>"]
 license = "MIT"
 
 [dependencies]
-clap = { version = "3.2.16", features = ["derive"] }
+clap = { version = "3.2.17", features = ["derive"] }
 ipa-sounds = { git = "https://github.com/miralushch/ipa-sounds" }
