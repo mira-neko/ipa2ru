@@ -187,13 +187,13 @@ impl From<ipa_sounds::Ipa> for Ru {
 
 impl From<&str> for Ru {
     fn from(ipa_str: &str) -> Self {
-        Self::from(ipa_sounds::Ipa::new(ipa_str).unwrap())
+        Self::from(ipa_sounds::Ipa::from(ipa_str))
     }
 }
 
 impl From<String> for Ru {
     fn from(ipa_string: String) -> Self {
-        Self::from(ipa_string.as_str())
+        Self::from(ipa_sounds::Ipa::from(ipa_string))
     }
 }
 
