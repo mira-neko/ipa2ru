@@ -173,21 +173,27 @@ impl fmt::Display for PhonemeSeq {
 #[derive(Clone)]
 pub struct Ru(PhonemeSeq);
 
-impl Ru {
-    pub fn new(ipa: ipa_sounds::Ipa) -> Self {
-        Ru(PhonemeSeq::new(ipa))
-    }
-}
-
 impl fmt::Display for Ru {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(formatter)
     }
 }
 
+impl From<ipa_sounds::Ipa> for Ru {
+    fn from(ipa: ipa_sounds::Ipa) -> Self {
+        Self(PhonemeSeq::new(ipa))
+    }
+}
+
 impl From<&str> for Ru {
     fn from(ipa_str: &str) -> Self {
-        Self::new(ipa_sounds::Ipa::new(ipa_str).unwrap())
+        Self::from(ipa_sounds::Ipa::new(ipa_str).unwrap())
+    }
+}
+
+impl From<String> for Ru {
+    fn from(ipa_string: String) -> Self {
+        Self::from(ipa_string.as_str())
     }
 }
 
@@ -277,7 +283,7 @@ mod ru_integration_tests {
     #[test]
     fn test_na() {
         assert_eq!(
-            format!("{}", Ru::new(ipa_sounds::Ipa::new("nʲæ").unwrap())),
+            format!("{}", Ru::from("nʲæ")),
             "ня"
         );
     }
@@ -285,7 +291,7 @@ mod ru_integration_tests {
     #[test]
     fn test_na_nan() {
         assert_eq!(
-            format!("{}", Ru::new(ipa_sounds::Ipa::new("nʲæ nʲæn").unwrap())),
+            format!("{}", Ru::from("nʲæ nʲæn")),
             "ня нян"
         );
     }
@@ -293,7 +299,7 @@ mod ru_integration_tests {
     #[test]
     fn test_maau() {
         assert_eq!(
-            format!("{}", Ru::new(ipa_sounds::Ipa::new("mʲæːu").unwrap())),
+            format!("{}", Ru::from("mʲæːu")),
             "мяау"
         );
     }
@@ -301,7 +307,7 @@ mod ru_integration_tests {
     #[test]
     fn test_mmaau() {
         assert_eq!(
-            format!("{}", Ru::new(ipa_sounds::Ipa::new("mʲːæːu").unwrap())),
+            format!("{}", Ru::from("mʲːæːu")),
             "мьмяау"
         );
     }
