@@ -98,7 +98,7 @@ dependencies = [
 [[package]]
 name = "ipa-sounds"
 version = "0.1.0"
-source = "git+https://github.com/miralushch/ipa-sounds#d02c005cfa502d695ac0223751c0493ba2d5fcd8"
+source = "git+https://github.com/miralushch/ipa-sounds#3bf15dacae7949624a3f8af50256efde7a9a07e5"
 
 [[package]]
 name = "ipa2ru"
