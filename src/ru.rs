@@ -54,6 +54,7 @@ impl PhonemeSeq {
                 CloseFrontRounded           => (Vowel { phoneme: U }, is_long),
                 CloseFrontUnrounded         => (Vowel { phoneme: I }, is_long),
                 CloseMidFrontRounded        => (Vowel { phoneme: O }, is_long),
+                CloseMidFrontUnrounded      => (Vowel { phoneme: E }, is_long),
                 MidCentral                  => (Vowel { phoneme: A }, is_long),
                 NearCloseNearBackRounded    => (Vowel { phoneme: U }, is_long),
                 NearCloseNearFrontRounded   => (Vowel { phoneme: U }, is_long),
