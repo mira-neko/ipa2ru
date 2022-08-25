@@ -1,3 +1,5 @@
+use fp_vec::Fpushable;
+use pipeline::*;
 use std::fmt;
 
 #[allow(dead_code)]
@@ -38,54 +40,56 @@ impl PhonemeSeq {
     }
 
     fn next(self, sound: &ipa_sounds::Sound) -> Self {
-        use ipa_sounds::{Consonants::*, Vowels::*};
+        use ipa_sounds::{Sound, Consonants::*, Vowels::*};
         use PalatalizedOnlyConsonants::*;
         use Consonants::*;
         use Phoneme::*;
         use Vowels::*;
 
-        let mut vec = self.0;
-        let next_sound = match *sound {
-            ipa_sounds::Sound::Vowel { phoneme, is_long } => match phoneme {
-                CloseBackRounded            => (Vowel { phoneme: U }, is_long),
-                CloseBackUnrounded          => (Vowel { phoneme: U }, is_long),
-                CloseCentralRounded         => (Vowel { phoneme: U }, is_long),
-                CloseCentralUnrounded       => (Vowel { phoneme: I }, is_long),
-                CloseFrontRounded           => (Vowel { phoneme: U }, is_long),
-                CloseFrontUnrounded         => (Vowel { phoneme: I }, is_long),
-                CloseMidFrontRounded        => (Vowel { phoneme: O }, is_long),
-                CloseMidFrontUnrounded      => (Vowel { phoneme: E }, is_long),
-                MidCentral                  => (Vowel { phoneme: A }, is_long),
-                NearCloseNearBackRounded    => (Vowel { phoneme: U }, is_long),
-                NearCloseNearFrontRounded   => (Vowel { phoneme: U }, is_long),
-                NearCloseNearFrontUnrounded => (Vowel { phoneme: E }, is_long),
-                NearOpenFrontUrounded       => (Vowel { phoneme: A }, is_long),
-                OpenBackUnrounded           => (Vowel { phoneme: A }, is_long),
-                OpenFrontUnrounded          => (Vowel { phoneme: A }, is_long),
-                OpenMidBackUnrounded        => (Vowel { phoneme: A }, is_long),
-            },
-            ipa_sounds::Sound::Consonant { phoneme, is_long, is_palatalized } => match phoneme {
-                VoicedAlveolarNasal      => (Consonant { phoneme: N, is_palatalized }, is_long),
-                VoicedBilabialNasal      => (Consonant { phoneme: M, is_palatalized }, is_long),
-                VoicedPalatalApproximant => (PalatalizedOnlyConsonant  { phoneme: J }, is_long),
-                VoicelessBilabialPlosive => (Consonant { phoneme: P, is_palatalized }, is_long),
-            },
-            ipa_sounds::Sound::Space => (Phoneme::Probel, false)
-        };
-        if next_sound.1 {
-            vec.push(next_sound.0);
-            vec.push(next_sound.0);
-        } else {
-            vec.push(next_sound.0);
-        }
-        Self(vec)
+        pipe!(
+            match *sound {
+                Sound::Vowel { phoneme, is_long } => match phoneme {
+                    CloseBackRounded            => (Vowel { phoneme: U }, is_long),
+                    CloseBackUnrounded          => (Vowel { phoneme: U }, is_long),
+                    CloseCentralRounded         => (Vowel { phoneme: U }, is_long),
+                    CloseCentralUnrounded       => (Vowel { phoneme: I }, is_long),
+                    CloseFrontRounded           => (Vowel { phoneme: U }, is_long),
+                    CloseFrontUnrounded         => (Vowel { phoneme: I }, is_long),
+                    CloseMidFrontRounded        => (Vowel { phoneme: O }, is_long),
+                    CloseMidFrontUnrounded      => (Vowel { phoneme: E }, is_long),
+                    MidCentral                  => (Vowel { phoneme: A }, is_long),
+                    NearCloseNearBackRounded    => (Vowel { phoneme: U }, is_long),
+                    NearCloseNearFrontRounded   => (Vowel { phoneme: U }, is_long),
+                    NearCloseNearFrontUnrounded => (Vowel { phoneme: E }, is_long),
+                    NearOpenFrontUrounded       => (Vowel { phoneme: A }, is_long),
+                    OpenBackUnrounded           => (Vowel { phoneme: A }, is_long),
+                    OpenFrontUnrounded          => (Vowel { phoneme: A }, is_long),
+                    OpenMidBackUnrounded        => (Vowel { phoneme: A }, is_long),
+                },
+                ipa_sounds::Sound::Consonant { phoneme, is_long, is_palatalized } => match phoneme {
+                    VoicedAlveolarNasal      => (Consonant { phoneme: N, is_palatalized }, is_long),
+                    VoicedBilabialNasal      => (Consonant { phoneme: M, is_palatalized }, is_long),
+                    VoicedPalatalApproximant => (PalatalizedOnlyConsonant  { phoneme: J }, is_long),
+                    VoicelessBilabialPlosive => (Consonant { phoneme: P, is_palatalized }, is_long),
+                },
+                ipa_sounds::Sound::Space => (Phoneme::Probel, false)
+            }
+            => {|(phoneme, is_long): (Phoneme, bool)|
+                if is_long {
+                    self.0.fpush(phoneme).fpush(phoneme)
+                } else {
+                    self.0.fpush(phoneme)
+                }
+            }
+            => Self
+        )
     }
 }
 
 #[deny(unused_must_use)]
 impl fmt::Display for PhonemeSeq {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        for i in 0..self.0.len() {
+        (0..self.0.len()).try_for_each(|i| {
             let is_prev_palatalized = match i {
                 0 => false,
                 _ => match self.0[i - 1] {
@@ -171,9 +175,8 @@ impl fmt::Display for PhonemeSeq {
                     PalatalizedOnlyConsonants::Q => "ч"
                 },
                 Phoneme::Probel => " "
-            })?;
-        }
-        Ok(())
+            })
+        })
     }
 }
 
