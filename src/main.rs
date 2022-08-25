@@ -11,6 +11,5 @@ struct Cli {
 }
 
 fn main() -> Result<(), ipa_sounds::Error> {
-    println!("{}", Ru::from(Cli::parse().ipa));
-    Ok(())
+    Ru::try_from(Cli::parse().ipa).map(|ru| println!("{}", ru))
 }

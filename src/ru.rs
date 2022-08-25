@@ -192,15 +192,19 @@ impl From<ipa_sounds::Ipa> for Ru {
     }
 }
 
-impl From<&str> for Ru {
-    fn from(ipa_str: &str) -> Self {
-        Self::from(ipa_sounds::Ipa::from(ipa_str))
+impl TryFrom<&str> for Ru {
+    type Error = ipa_sounds::Error;
+
+    fn try_from(ipa_str: &str) -> Result<Self, Self::Error> {
+        ipa_sounds::Ipa::try_from(ipa_str).map(Self::from)
     }
 }
 
-impl From<String> for Ru {
-    fn from(ipa_string: String) -> Self {
-        Self::from(ipa_sounds::Ipa::from(ipa_string))
+impl TryFrom<String> for Ru {
+    type Error = ipa_sounds::Error;
+
+    fn try_from(ipa_string: String) -> Result<Self, Self::Error> {
+        ipa_sounds::Ipa::try_from(ipa_string).map(Self::from)
     }
 }
 
@@ -290,32 +294,32 @@ mod ru_integration_tests {
     #[test]
     fn test_na() {
         assert_eq!(
-            format!("{}", Ru::from("nʲæ")),
-            "ня"
+            Ru::try_from("nʲæ").map(|ru| format!("{}", ru)),
+            Ok("ня".to_owned())
         );
     }
 
     #[test]
     fn test_na_nan() {
         assert_eq!(
-            format!("{}", Ru::from("nʲæ nʲæn")),
-            "ня нян"
+            Ru::try_from("nʲæ nʲæn").map(|ru| format!("{}", ru)),
+            Ok("ня нян".to_owned())
         );
     }
 
     #[test]
     fn test_maau() {
         assert_eq!(
-            format!("{}", Ru::from("mʲæːu")),
-            "мяау"
+            Ru::try_from("mʲæːu").map(|ru| format!("{}", ru)),
+            Ok("мяау".to_owned())
         );
     }
 
     #[test]
     fn test_mmaau() {
         assert_eq!(
-            format!("{}", Ru::from("mʲːæːu")),
-            "мьмяау"
+            Ru::try_from("mʲːæːu").map(|ru| format!("{}", ru)),
+            Ok("мьмяау".to_owned())
         );
     }
 }
