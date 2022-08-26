@@ -3,6 +3,16 @@
 version = 3
 
 [[package]]
+name = "alt-enum"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fa2b1115c25bbfb894f4167dd4cadaae0cbe937d6d1def48aded44a58e19bcde"
+dependencies = [
+ "paste",
+ "value-enum",
+]
+
+[[package]]
 name = "atty"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -97,10 +107,10 @@ dependencies = [
 
 [[package]]
 name = "ipa-sounds"
-version = "0.3.1"
-source = "git+https://github.com/miralushch/ipa-sounds#0c7b4d89ed7d89d4e5fd1f11f4899bb46b6be82e"
+version = "0.4.0"
+source = "git+https://github.com/miralushch/ipa-sounds#d097516dd95df8c3d9aba5ab20f8fb051d16f1eb"
 dependencies = [
- "value-enum",
+ "alt-enum",
 ]
 
 [[package]]
@@ -109,7 +119,6 @@ version = "0.4.0"
 dependencies = [
  "clap",
  "ipa-sounds",
- "value-enum",
 ]
 
 [[package]]
@@ -129,6 +138,12 @@ name = "os_str_bytes"
 version = "6.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ff7415e9ae3fff1225851df9e0d9e4e5479f947619774677a63572e55e80eff"
+
+[[package]]
+name = "paste"
+version = "1.0.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9423e2b32f7a043629287a536f21951e8c6a82482d0acb1eeebfc90bc2225b22"
 
 [[package]]
 name = "proc-macro-error"
@@ -212,8 +227,9 @@ checksum = "c4f5b37a154999a8f3f98cc23a628d850e154479cd94decf3414696e12e31aaf"
 
 [[package]]
 name = "value-enum"
-version = "0.2.0"
-source = "git+https://github.com/miralushch/value-enum#765525b2d535f506252d5c1ca8e4ed3fad9653ef"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7150a203dc5cb463c4c565784d8f55bf7e9ffe1312950f992c448944d425a62b"
 
 [[package]]
 name = "version_check"

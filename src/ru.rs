@@ -1,19 +1,11 @@
-use value_enum::value_enum;
 use std::iter;
 use std::fmt;
 
-value_enum!(
-    &'static str =>
-    #[allow(dead_code)]
-    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-    enum Vowels {
-        A = "ая",
-        E = "эе",
-        I = "ыи",
-        O = "оё",
-        U = "ую",
-    }
-);
+#[allow(dead_code)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Vowels {
+    A,  E,  I,  O,  U
+}
 
 #[inline]
 fn vowels_lookup(vowel: ipa_sounds::Vowels) -> Vowels {
@@ -27,6 +19,10 @@ fn vowels_lookup(vowel: ipa_sounds::Vowels) -> Vowels {
         CloseCentralUnrounded       => I,
         CloseFrontRounded           => U,
         CloseFrontUnrounded         => I,
+        CloseMidBackRounded         => O,
+        CloseMidBackUnrounded       => U,
+        CloseMidCentralRounded      => U,
+        CloseMidCentralUnrounded    => E,
         CloseMidFrontRounded        => O,
         CloseMidFrontUnrounded      => E,
         MidCentral                  => A,
@@ -151,7 +147,13 @@ impl fmt::Display for PhonemeSeq {
             write!(formatter, "{}", match self.0[i] {
                 Phoneme::Vowel { phoneme } => {
                     let is_vowel_palatalizing = is_prev_palatalized && !is_q_or_wj_prev;
-                    <&str>::from(phoneme).chars().nth(is_vowel_palatalizing as usize).unwrap().to_string()
+                    match phoneme {
+                        Vowels::A => if is_vowel_palatalizing { "я" } else { "а" },
+                        Vowels::E => if is_vowel_palatalizing { "е" } else { "э" },
+                        Vowels::I => if is_vowel_palatalizing { "и" } else { "ы" },
+                        Vowels::O => if is_vowel_palatalizing { "ё" } else { "о" },
+                        Vowels::U => if is_vowel_palatalizing { "ю" } else { "у" },
+                    }
                 },
                 Phoneme::Consonant {phoneme, is_palatalized } => {
                     let is_jer = is_palatalized && !is_vowel_next;
@@ -174,7 +176,7 @@ impl fmt::Display for PhonemeSeq {
                         Consonants::R => if is_jer { "рь" } else { "р" },
                         Consonants::H => if is_jer { "хь" } else { "х" },
                         Consonants::C => if is_jer { "сь" } else { "с" },
-                    }.to_owned()
+                    }
                 },
                 Phoneme::PalatalizedOnlyConsonant { phoneme } => match phoneme {
                     PalatalizedOnlyConsonants::J => if is_vowel_next && is_consonant_prev {
@@ -185,8 +187,8 @@ impl fmt::Display for PhonemeSeq {
                         ""
                     },
                     PalatalizedOnlyConsonants::Q => "ч"
-                }.to_owned(),
-                Phoneme::Probel => " ".to_owned()
+                },
+                Phoneme::Probel => " "
             })
         })
     }
