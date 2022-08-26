@@ -65,11 +65,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fp-vec"
-version = "0.1.0"
-source = "git+https://github.com/miralushch/fp-vec/#a814c5cc1235bd1e5c83969a106b377ae42a626d"
-
-[[package]]
 name = "hashbrown"
 version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -102,20 +97,18 @@ dependencies = [
 
 [[package]]
 name = "ipa-sounds"
-version = "0.2.0"
-source = "git+https://github.com/miralushch/ipa-sounds#599d0e79e01728a59aa096bb7b12d162cc1d142e"
+version = "0.3.0"
+source = "git+https://github.com/miralushch/ipa-sounds#6677dce9ae5ace940b83009c1a70eefff2f8ddc4"
 dependencies = [
- "fp-vec",
+ "value-enum",
 ]
 
 [[package]]
 name = "ipa2ru"
-version = "0.3.1"
+version = "0.4.0"
 dependencies = [
  "clap",
- "fp-vec",
  "ipa-sounds",
- "pipeline",
 ]
 
 [[package]]
@@ -135,12 +128,6 @@ name = "os_str_bytes"
 version = "6.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ff7415e9ae3fff1225851df9e0d9e4e5479f947619774677a63572e55e80eff"
-
-[[package]]
-name = "pipeline"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d15b6607fa632996eb8a17c9041cb6071cb75ac057abd45dece578723ea8c7c0"
 
 [[package]]
 name = "proc-macro-error"
@@ -221,6 +208,11 @@ name = "unicode-ident"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c4f5b37a154999a8f3f98cc23a628d850e154479cd94decf3414696e12e31aaf"
+
+[[package]]
+name = "value-enum"
+version = "0.2.0"
+source = "git+https://github.com/miralushch/value-enum#765525b2d535f506252d5c1ca8e4ed3fad9653ef"
 
 [[package]]
 name = "version_check"

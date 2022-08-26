@@ -1,13 +1,11 @@
 [package]
 name = "ipa2ru"
-version = "0.3.1"
+version = "0.4.0"
 edition = "2021"
 description = "Translator from IPA to russian"
 authors = ["Мира Лущаева <miralushch@gmail.com>"]
 license = "MIT"
 
 [dependencies]
-pipeline = "0.5.0"
 clap = { version = "3.2.17", features = ["derive"] }
-fp-vec = { version = "0.1.0", git = "https://github.com/miralushch/fp-vec/" }
-ipa-sounds = { version = "0.2.0", git = "https://github.com/miralushch/ipa-sounds" }
+ipa-sounds = { version = "0.3.0", git = "https://github.com/miralushch/ipa-sounds" }
