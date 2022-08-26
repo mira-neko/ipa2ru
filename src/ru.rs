@@ -1,9 +1,43 @@
+use value_enum::value_enum;
+use std::iter;
 use std::fmt;
 
-#[allow(dead_code)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum Vowels {
-    A,  E,  I,  O,  U
+value_enum!(
+    &'static str =>
+    #[allow(dead_code)]
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    enum Vowels {
+        A = "ая",
+        E = "эе",
+        I = "ыи",
+        O = "оё",
+        U = "ую",
+    }
+);
+
+#[inline]
+fn vowels_lookup(vowel: ipa_sounds::Vowels) -> Vowels {
+    use ipa_sounds::Vowels::*;
+    use Vowels::*;
+
+    match vowel {
+        CloseBackRounded            => U,
+        CloseBackUnrounded          => U,
+        CloseCentralRounded         => U,
+        CloseCentralUnrounded       => I,
+        CloseFrontRounded           => U,
+        CloseFrontUnrounded         => I,
+        CloseMidFrontRounded        => O,
+        CloseMidFrontUnrounded      => E,
+        MidCentral                  => A,
+        NearCloseNearBackRounded    => U,
+        NearCloseNearFrontRounded   => U,
+        NearCloseNearFrontUnrounded => E,
+        NearOpenFrontUrounded       => A,
+        OpenBackUnrounded           => A,
+        OpenFrontUnrounded          => A,
+        OpenMidBackUnrounded        => A,
+    }
 }
 
 #[allow(dead_code)]
@@ -29,54 +63,42 @@ enum Phoneme {
     Probel
 }
 
+#[inline]
+fn consonants_lookup(consonant: ipa_sounds::Consonants, is_palatalized: bool) -> Phoneme {
+    use PalatalizedOnlyConsonants::*;
+    use ipa_sounds::Consonants::*;
+    use Consonants::*;
+    use Phoneme::*;
+
+    match consonant {
+        VoicedAlveolarNasal      => Consonant { phoneme: N, is_palatalized },
+        VoicedBilabialNasal      => Consonant { phoneme: M, is_palatalized },
+        VoicedPalatalApproximant => PalatalizedOnlyConsonant  { phoneme: J },
+        VoicelessBilabialPlosive => Consonant { phoneme: P, is_palatalized },
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct PhonemeSeq(Vec<Phoneme>);
 
 impl PhonemeSeq {
     fn new(ipa: ipa_sounds::Ipa) -> Self {
         Self (
-            (&ipa).iter()
-            .map(|sound| {
-                use ipa_sounds::{Sound, Consonants::*, Vowels::*};
-                use PalatalizedOnlyConsonants::*;
-                use Consonants::*;
-                use Phoneme::*;
-                use Vowels::*;
-        
+            ipa.iter()
+            .flat_map(|sound| {        
                 let (phoneme, is_long) = match *sound {
-                    Sound::Vowel { phoneme, is_long } => match phoneme {
-                        CloseBackRounded            => (Vowel { phoneme: U }, is_long),
-                        CloseBackUnrounded          => (Vowel { phoneme: U }, is_long),
-                        CloseCentralRounded         => (Vowel { phoneme: U }, is_long),
-                        CloseCentralUnrounded       => (Vowel { phoneme: I }, is_long),
-                        CloseFrontRounded           => (Vowel { phoneme: U }, is_long),
-                        CloseFrontUnrounded         => (Vowel { phoneme: I }, is_long),
-                        CloseMidFrontRounded        => (Vowel { phoneme: O }, is_long),
-                        CloseMidFrontUnrounded      => (Vowel { phoneme: E }, is_long),
-                        MidCentral                  => (Vowel { phoneme: A }, is_long),
-                        NearCloseNearBackRounded    => (Vowel { phoneme: U }, is_long),
-                        NearCloseNearFrontRounded   => (Vowel { phoneme: U }, is_long),
-                        NearCloseNearFrontUnrounded => (Vowel { phoneme: E }, is_long),
-                        NearOpenFrontUrounded       => (Vowel { phoneme: A }, is_long),
-                        OpenBackUnrounded           => (Vowel { phoneme: A }, is_long),
-                        OpenFrontUnrounded          => (Vowel { phoneme: A }, is_long),
-                        OpenMidBackUnrounded        => (Vowel { phoneme: A }, is_long),
-                    },
-                    ipa_sounds::Sound::Consonant { phoneme, is_long, is_palatalized } => match phoneme {
-                        VoicedAlveolarNasal      => (Consonant { phoneme: N, is_palatalized }, is_long),
-                        VoicedBilabialNasal      => (Consonant { phoneme: M, is_palatalized }, is_long),
-                        VoicedPalatalApproximant => (PalatalizedOnlyConsonant  { phoneme: J }, is_long),
-                        VoicelessBilabialPlosive => (Consonant { phoneme: P, is_palatalized }, is_long),
-                    },
+                    ipa_sounds::Sound::Vowel { phoneme, is_long } => (
+                        Phoneme::Vowel { phoneme: vowels_lookup(phoneme) },
+                        is_long
+                    ),
+                    ipa_sounds::Sound::Consonant { phoneme, is_long, is_palatalized } => (
+                        consonants_lookup(phoneme, is_palatalized),
+                        is_long
+                    ),
                     ipa_sounds::Sound::Space => (Phoneme::Probel, false)
                 };
-                if is_long {
-                    vec![phoneme, phoneme].into_iter()
-                } else {
-                    vec![phoneme].into_iter()
-                }
+                iter::repeat(phoneme).take(is_long as usize + 1)
             })
-            .flatten()
             .collect::<Vec<Phoneme>>()
         )
     }
@@ -129,13 +151,7 @@ impl fmt::Display for PhonemeSeq {
             write!(formatter, "{}", match self.0[i] {
                 Phoneme::Vowel { phoneme } => {
                     let is_vowel_palatalizing = is_prev_palatalized && !is_q_or_wj_prev;
-                    match phoneme {
-                        Vowels::A => if is_vowel_palatalizing { "я" } else { "а" },
-                        Vowels::E => if is_vowel_palatalizing { "е" } else { "э" },
-                        Vowels::I => if is_vowel_palatalizing { "и" } else { "ы" },
-                        Vowels::O => if is_vowel_palatalizing { "ё" } else { "о" },
-                        Vowels::U => if is_vowel_palatalizing { "ю" } else { "у" },
-                    }
+                    <&str>::from(phoneme).chars().nth(is_vowel_palatalizing as usize).unwrap().to_string()
                 },
                 Phoneme::Consonant {phoneme, is_palatalized } => {
                     let is_jer = is_palatalized && !is_vowel_next;
@@ -158,7 +174,7 @@ impl fmt::Display for PhonemeSeq {
                         Consonants::R => if is_jer { "рь" } else { "р" },
                         Consonants::H => if is_jer { "хь" } else { "х" },
                         Consonants::C => if is_jer { "сь" } else { "с" },
-                    }
+                    }.to_owned()
                 },
                 Phoneme::PalatalizedOnlyConsonant { phoneme } => match phoneme {
                     PalatalizedOnlyConsonants::J => if is_vowel_next && is_consonant_prev {
@@ -169,8 +185,8 @@ impl fmt::Display for PhonemeSeq {
                         ""
                     },
                     PalatalizedOnlyConsonants::Q => "ч"
-                },
-                Phoneme::Probel => " "
+                }.to_owned(),
+                Phoneme::Probel => " ".to_owned()
             })
         })
     }

@@ -9,3 +9,5 @@ license = "MIT"
 [dependencies]
 clap = { version = "3.2.17", features = ["derive"] }
 ipa-sounds = { version = "0.3.1", git = "https://github.com/miralushch/ipa-sounds" }
+value-enum = { version = "0.2.0", git = "https://github.com/miralushch/value-enum" }
+
